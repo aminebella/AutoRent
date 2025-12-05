@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Frontend\BackOfficeUI\Cars\" />
+    <Folder Include="Frontend\BackOfficeUI\Employees\" />
+    <Folder Include="Frontend\BackOfficeUI\Reservations\" />
+    <Folder Include="Frontend\BackOfficeUI\Requests\" />
+    <Folder Include="Frontend\BackOfficeUI\Payments\" />
+    <Folder Include="Frontend\FontOfficeUI\Cars\" />
+    <Folder Include="Frontend\FontOfficeUI\Reservations\" />
+    <Folder Include="Frontend\FontOfficeUI\Requests\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MySql.Data" Version="9.5.0" />
+  </ItemGroup>
+
+</Project>

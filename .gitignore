@@ -1,0 +1,43 @@
+## Ignore Visual Studio temporary files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Ignore build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+## Ignore auto-generated files
+*.ncb
+*.aps
+*.rej
+*.cache
+*.pdb
+*.mdb
+*.ilk
+*.ipch
+
+## Ignore .NET artifacts
+*.dll
+*.exe
+
+## Ignore NuGet
+*.nupkg
+packages/
+*.snupkg
+
+## Ignore Rider
+.idea/
+
+## Ignore VSCode settings
+.vscode/
