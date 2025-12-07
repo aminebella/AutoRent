@@ -19,6 +19,8 @@ namespace CarRentalApp.Backend.Services
             userDao = new UserDao();
         }
 
+        // Admin:
+        // Admin auth see Auth service
         // 🔹 Get all clients
         public List<User> GetAllClients()
         {
@@ -39,7 +41,7 @@ namespace CarRentalApp.Backend.Services
                 string.IsNullOrWhiteSpace(user.Password))
                 return false;
 
-            user.Role = "client"; // Ensure role always client
+            user.Role = "CLIENT"; // Ensure role always client
             return userDao.AddClient(user);
         }
 
@@ -60,24 +62,21 @@ namespace CarRentalApp.Backend.Services
             return userDao.DeleteClient(id);
         }
 
-        // Search By last_name
-        public List<User> SearchClientByLastName(string LastName)
-        {
-            List<User> clients = new List<User>();
-            string query = "SELECT * FROM users where last_name like @format";
-            using (MySqlConnection conn = DbConnection.GetConnection())
-            {
-                conn.Open();
-                MySqlCommand cmd = new MySqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@format", '%'+LastName+'%');
-                MySqlDataReader reader = cmd.ExecuteReader();
-                if (reader.Read())
-                {
-                    clients.Add(HelperClient.MapUser(reader));
-                }
+        // Search By first_name
+        public List<User> SearchClientByFirstName(string value) => userDao.SearchClientByAtt("first_name", value);
 
-            }
-            return clients;
-        }
+        // Search By last_name
+        public List<User> SearchClientByLastName(string value) => userDao.SearchClientByAtt("last_name", value);
+
+        // Search By email
+        public List<User> SearchClientByEmail(string value) => userDao.SearchClientByAtt("email", value);
+
+        // See list of request of specific client : SEE REQUEST SERVICE
+
+        // See list of reservation of specific client : SEE RESERVATION SERVICE
+
+
+
+        // Client Auth : See Auth service
     }
 }

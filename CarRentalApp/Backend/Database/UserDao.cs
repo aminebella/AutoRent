@@ -16,11 +16,11 @@ namespace CarRentalApp.Backend.Database
     {
         public UserDao() { }
 
-        // GetAllClients
-        public List<User> GetAllClients()
+        // GetAllClients Active Ones(Not Deleted)
+        public List<User> GetAllClients()//active ones
         {
             List<User> clients = new List<User>();
-            string query = "SELECT * FROM users WHERE role = @role";
+            string query = "SELECT * FROM users WHERE role = @role AND is_active = 1";
 
             using (MySqlConnection conn = DbConnection.GetConnection())
             {
@@ -32,6 +32,23 @@ namespace CarRentalApp.Backend.Database
                 {
                     clients.Add(HelperClient.MapUser(reader));
                 }
+            }
+            return clients;
+        }
+
+        // GetAllInactiveClients
+        public List<User> GetInactiveClients()
+        {
+            List<User> clients = new List<User>();
+            string query = "SELECT * FROM users WHERE role = 'CLIENT' AND is_active = 0";
+
+            using (MySqlConnection conn = DbConnection.GetConnection())
+            {
+                conn.Open();
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                MySqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                    clients.Add(HelperClient.MapUser(reader));
             }
             return clients;
         }
@@ -59,8 +76,8 @@ namespace CarRentalApp.Backend.Database
         // AddClient
         public bool AddClient(User user)
         {
-            string query = @"INSERT INTO users (first_name, last_name, phone, role, email, password)
-                                 VALUES (@first_name, @last_name, @phone, @role, @email, @password)";
+            string query = @"INSERT INTO users (first_name, last_name, phone, role, email, password, is_active)
+                                 VALUES (@first_name, @last_name, @phone, @role, @email, @password, @is_active)";
             using (MySqlConnection conn = DbConnection.GetConnection())
             {
                 conn.Open();
@@ -71,6 +88,7 @@ namespace CarRentalApp.Backend.Database
                 cmd.Parameters.AddWithValue("@role", user.Role);
                 cmd.Parameters.AddWithValue("@email", user.Email);
                 cmd.Parameters.AddWithValue("@password", user.Password);
+                cmd.Parameters.AddWithValue("@is_active", true);
                 return cmd.ExecuteNonQuery()>0;
             }
         }
@@ -80,7 +98,7 @@ namespace CarRentalApp.Backend.Database
         {
             string query = @"UPDATE users SET 
                                  first_name=@first_name, last_name=@last_name, phone=@phone, 
-                                 role=@role, email=@email, password=@password
+                                 role=@role, email=@email, password=@password, is_active=@is_active
                            WHERE id=@id";
             using (MySqlConnection conn = DbConnection.GetConnection())
             {
@@ -93,13 +111,15 @@ namespace CarRentalApp.Backend.Database
                 cmd.Parameters.AddWithValue("@role", user.Role);
                 cmd.Parameters.AddWithValue("@email", user.Email);
                 cmd.Parameters.AddWithValue("@password", user.Password);
+                cmd.Parameters.AddWithValue("@is_active", user.IsActive);
                 return cmd.ExecuteNonQuery() > 0;
             }
         }
         // DeleteClient
         public bool DeleteClient(int id)
         {
-            string query = "DELETE FROM users WHERE id=@id";
+            //string query = "DELETE FROM users WHERE id=@id";
+            string query = "UPDATE users SET is_active = 0 WHERE id=@id";
             using (MySqlConnection conn = DbConnection.GetConnection())
             {
                 conn.Open();
@@ -110,6 +130,46 @@ namespace CarRentalApp.Backend.Database
             }
 
         }
+
+        // Reactivate client (Opposite of delete)
+        public bool ActivateClient(int id)
+        {
+            string query = "UPDATE users SET is_active = 1 WHERE id=@id";
+            using (MySqlConnection conn = DbConnection.GetConnection())
+            {
+                conn.Open();
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@id", id);
+                return cmd.ExecuteNonQuery() > 0;
+            }
+        }
+
+
+        // Search By Att
+        public List<User> SearchClientByAtt(string columnName, string value)
+        {
+            List<User> clients = new List<User>();
+            // Allowed columns
+            List<string> allowedColumns = new List<string> { "first_name", "last_name", "email" };
+            if (!allowedColumns.Contains(columnName.ToLower()))
+                throw new ArgumentException("Invalid column name");
+
+            string query = $"SELECT * FROM users where {columnName} like @format";
+            using (MySqlConnection conn = DbConnection.GetConnection())
+            {
+                conn.Open();
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@format", '%' + value + '%');
+                MySqlDataReader reader = cmd.ExecuteReader();
+                if (reader.Read())
+                {
+                    clients.Add(HelperClient.MapUser(reader));
+                }
+
+            }
+            return clients;
+        }
+
 
         //SearchClientByAtt
         //public List<User> SearchClientByAtt(string colonne, string format)

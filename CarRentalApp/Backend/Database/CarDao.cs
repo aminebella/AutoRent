@@ -126,6 +126,25 @@ namespace CarRentalApp.Backend.Database
         }
 
 
+        // -------------------- UPDATE CAR STATUS --------------------
+        public bool UpdateCarStatus(int carId, string status)
+        {
+            string query = @"
+                UPDATE cars SET
+                    status = @status,
+                WHERE id = @id";
+
+            using (MySqlConnection conn = DbConnection.GetConnection())
+            {
+                conn.Open();
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@id", carId);
+                cmd.Parameters.AddWithValue("@status", status);
+                return cmd.ExecuteNonQuery() > 0;
+            }
+        }
+
+
         // ============================================================
         //                      FILTER METHODS
         // ============================================================

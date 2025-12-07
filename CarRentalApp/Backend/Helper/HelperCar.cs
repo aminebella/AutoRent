@@ -22,7 +22,9 @@ namespace backendclienttesting.Backend.Helper
                 Brand = reader.GetString("brand"),
                 Model = reader.GetString("model"),
                 Year = reader.GetInt32("year"),
-                Color = reader.GetString("color"),
+                Color =reader.IsDBNull(reader.GetOrdinal("color"))
+                    ? null
+                    : reader.GetString("color"),
                 PricePerDay = reader.GetDecimal("price_per_day"),
                 Status = reader.GetString("status"),
                 CategoryName = reader.GetString("category_name")

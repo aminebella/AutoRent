@@ -21,10 +21,13 @@ namespace CarRentalApp.Backend.Helper
                 Id = reader.GetInt32("id"),
                 FirstName = reader.GetString("first_name"), // or reader["first_name"].ToString(),
                 LastName = reader.GetString("last_name"), // reader["last_name"].ToString(),
-                Phone = reader.GetString("phone"), // reader["phone"].ToString(),
+                Phone = reader.IsDBNull(reader.GetOrdinal("phone"))
+                    ? null
+                    : reader.GetString("phone"),
                 Role = reader.GetString("role"), // reader["role"].ToString(),
                 Email = reader.GetString("email"), // reader["email"].ToString(),
-                Password = reader.GetString("password") // reader["password"].ToString()
+                Password = reader.GetString("password"), // reader["password"].ToString()
+                IsActive = reader.GetBoolean("is_active")
             };
         }
     }
