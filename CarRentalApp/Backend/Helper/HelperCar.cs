@@ -25,10 +25,12 @@ namespace backendclienttesting.Backend.Helper
                 Color = reader.GetString("color"),
                 PricePerDay = reader.GetDecimal("price_per_day"),
                 Status = reader.GetString("status"),
-                CategoryName = reader.GetString("category_name")
-                //CategoryId = reader.GetInt32("category_id"),
-                //CategoryName = reader["name"] != DBNull.Value ? reader.GetString("name") : null
-            }; 
+                CategoryName = reader.GetString("category_name"),
+                LastMaintenanceDate = reader.GetDateTime("last_maintenance_date"),
+                MaintenanceIntervalDays = reader.GetInt32("maintenance_interval_days")
+            };
         }
+
     }
+
 }

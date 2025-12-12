@@ -17,5 +17,11 @@ namespace CarRentalApp.Backend.Models
         public string Status { get; set; }   // enum("AVAILABLE", "RESERVED", "MAINTENANCE", "UNAVAILABLE")
         //public int CategoryId { get; set; }  // FK → categories table
         public string CategoryName { get; set; } // enum('ECONOMY', 'SPORT', 'MIDSIZE', 'SUV')
+        public DateTime LastMaintenanceDate { get; set; }
+        public int MaintenanceIntervalDays { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+
+
     }
 }

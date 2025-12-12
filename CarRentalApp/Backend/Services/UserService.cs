@@ -19,65 +19,62 @@ namespace CarRentalApp.Backend.Services
             userDao = new UserDao();
         }
 
-        // 🔹 Get all clients
-        public List<User> GetAllClients()
+        // Verify att if null or not
+        private bool IsValid(User user)
         {
-            return userDao.GetAllClients();
+            if (string.IsNullOrWhiteSpace(user.FirstName)) return false;
+            if (string.IsNullOrWhiteSpace(user.LastName)) return false;
+            if (string.IsNullOrWhiteSpace(user.Email)) return false;
+            if (string.IsNullOrWhiteSpace(user.Password)) return false;
+            if (user.Password.Length < 5) return false;
+
+            return true;
         }
 
-        // 🔹 Get client by Id
-        public User GetClientById(int id)
-        {
-            return userDao.GetByIdClient(id);
-        }
+        // Admin:
+        // Index: Get all active clients
+        public List<User> GetAllClients() => userDao.GetAllClients();
+        
 
-        // 🔹 Add new client
+        // Filter: Get Inactive clients
+        public List<User> GetInactiveClients() => userDao.GetInactiveClients();
+
+        // show: Get client by Id
+        public User GetClientById(int id) => userDao.GetByIdClient(id);
+
+        // Add: Add new client
         public bool AddClient(User user)
         {
-            // Optional validation before inserting
-            if (string.IsNullOrWhiteSpace(user.Email) ||
-                string.IsNullOrWhiteSpace(user.Password))
-                return false;
-
-            user.Role = "client"; // Ensure role always client
+            // validation before inserting
+            if (!IsValid(user)) return false;
             return userDao.AddClient(user);
         }
 
-        // 🔹 Update client
+        // Update: Update client
         public bool UpdateClient(User user)
         {
             if (user.Id <= 0)
                 return false;
-
-            user.Role = "CLIENT";
-
+            if (!IsValid(user)) return false;
+            user.Password = userDao.HashPassword(user.Password); // Hash
             return userDao.UpdateClient(user);
         }
 
-        // 🔹 Delete client
-        public bool DeleteClient(int id)
-        {
-            return userDao.DeleteClient(id);
-        }
+
+        // Inactive Client: Soft delete Client
+        public bool DeactivateClient(int id) => userDao.DeleteClient(id);
+
+        // Reactivate Client
+        public bool ActivateClient(int id) => userDao.ActivateClient(id);
+
+        // Filter
+        // Search By first_name
+        public List<User> SearchClientByFirstName(string value) => userDao.SearchClientByAtt("first_name", value);
 
         // Search By last_name
-        public List<User> SearchClientByLastName(string LastName)
-        {
-            List<User> clients = new List<User>();
-            string query = "SELECT * FROM users where last_name like @format";
-            using (MySqlConnection conn = DbConnection.GetConnection())
-            {
-                conn.Open();
-                MySqlCommand cmd = new MySqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@format", '%'+LastName+'%');
-                MySqlDataReader reader = cmd.ExecuteReader();
-                if (reader.Read())
-                {
-                    clients.Add(HelperClient.MapUser(reader));
-                }
+        public List<User> SearchClientByLastName(string value) => userDao.SearchClientByAtt("last_name", value);
 
-            }
-            return clients;
-        }
+        // Search By email
+        public List<User> SearchClientByEmail(string value) => userDao.SearchClientByAtt("email", value);
     }
 }

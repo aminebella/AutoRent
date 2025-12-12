@@ -16,5 +16,6 @@ namespace CarRentalApp.Backend.Models
         public string Role { get; set; } // "ADMIN" or "CLIENT"
         public string Email { get; set; }
         public string Password { get; set; }
+        public bool IsActive { get; set; }
     }
 }

@@ -4,18 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CarRentalApp.Backend.Models
+namespace backendclienttesting.Backend.Models
 {
-    public class Reservation
+    public class Maintenance
     {
         public int Id { get; set; }
         public int CarId { get; set; }
-        public int UserId { get; set; }
-        public DateTime StartDate { get; set; }
+        public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
-        public decimal TotalPrice { get; set; }
-        public string Status { get; set; } // ACTIVE / CANCELLED / FINISHED
-        public string PaymentStatus { get; set; } // PAID / UNPAID
+        public string Description { get; set; }
+        public string Status { get; set; }   // ACTIVE or FINISHED
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
     }
