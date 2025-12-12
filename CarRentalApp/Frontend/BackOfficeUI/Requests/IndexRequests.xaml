@@ -1,0 +1,60 @@
+<Page x:Class="CarRentalApp.Frontend.BackOfficeUI.Requests.IndexRequests"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:CarRentalApp.Frontend.BackOfficeUI.Requests"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="Requests Index">
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Top buttons -->
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,10">
+            <Button Content="Add Request" Width="120" Margin="0,0,10,0" Click="AddRequest_Click"/>
+            <Button Content="Edit Request" Width="120" Margin="0,0,10,0" Click="EditRequest_Click"/>
+            <Button Content="Accept Request" Width="120" Margin="0,0,10,0" Click="AcceptRequest_Click"/>
+            <Button Content="Refuse Request" Width="120" Margin="0,0,10,0" Click="RefuseRequest_Click"/>
+            <Button Content="Delete Request" Width="120" Margin="0,0,10,0" Click="DeleteRequest_Click"/>
+            <Button Content="View Details" Width="110" Margin="0,0,10,0" Click="ViewDetails_Click"/>
+            <Button Content="Refresh" Width="100" Click="Refresh_Click"/>
+        </StackPanel>
+
+        <!-- Filter buttons -->
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0,0,0,10">
+            <Button Content="All" Width="80" Margin="0,0,10,0" Click="FilterAll_Click"/>
+            <Button Content="Pending" Width="80" Margin="0,0,10,0" Click="FilterPending_Click"/>
+            <Button Content="Accepted" Width="80" Margin="0,0,10,0" Click="FilterAccepted_Click"/>
+            <Button Content="Denied" Width="80" Margin="0,0,10,0" Click="FilterDenied_Click"/>
+            <Label Content="Filter by Client ID:" VerticalAlignment="Center" Margin="20,0,10,0"/>
+            <TextBox x:Name="ClientIdFilterTextBox" Width="100" Margin="0,0,10,0" KeyDown="ClientIdFilterTextBox_KeyDown"/>
+            <Button Content="Filter" Width="60" Margin="0,0,10,0" Click="FilterByClient_Click"/>
+            <Label Content="Filter by Car ID:" VerticalAlignment="Center" Margin="10,0,10,0"/>
+            <TextBox x:Name="CarIdFilterTextBox" Width="100" Margin="0,0,10,0" KeyDown="CarIdFilterTextBox_KeyDown"/>
+            <Button Content="Filter" Width="60" Click="FilterByCar_Click"/>
+        </StackPanel>
+
+        <DataGrid x:Name="RequestsDataGrid" Grid.Row="2"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  SelectionMode="Single">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
+                <DataGridTextColumn Header="Client ID" Binding="{Binding ClientId}" Width="80"/>
+                <DataGridTextColumn Header="Car ID" Binding="{Binding CarId}" Width="80"/>
+                <DataGridTextColumn Header="Start Date" Binding="{Binding StartDate, StringFormat=yyyy-MM-dd}" Width="120"/>
+                <DataGridTextColumn Header="End Date" Binding="{Binding EndDate, StringFormat=yyyy-MM-dd}" Width="120"/>
+                <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100"/>
+                <DataGridTextColumn Header="Message" Binding="{Binding Message}" Width="*"/>
+                <DataGridTextColumn Header="Created At" Binding="{Binding CreatedAt, StringFormat=yyyy-MM-dd HH:mm}" Width="150"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Page>
+
