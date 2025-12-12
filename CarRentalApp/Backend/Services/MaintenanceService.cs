@@ -78,7 +78,7 @@ namespace CarRentalApp.Backend.Services
         public void RunMaintenanceAutoFinish() => maintenanceDao.AutoFinishExpiredMaintenances();
 
 
-        // Automatic check if car needs maintenance, or the date of start maintenace is close (give warning)
+        // Automatic check if car needs maintenance, or the date of start maintenace is close (give warning), if arrive create automticlly a maintenance of this car with 10 days end_date= start_date+ 10 days
         //public bool AutoCheckAndSend(int carId)
         //{
         //    var car = carDao.GetCarById(carId);
@@ -104,69 +104,87 @@ namespace CarRentalApp.Backend.Services
 
         //    return false;
         //}
-        //public MaintenanceCheckResult AutoCheckAndSend(int carId)
-        //{
-        //    var car = carDao.GetCarById(carId);
+        public MaintenanceCheckResult AutoCheckAndSend(int carId)
+        {
+            var car = carDao.GetCarById(carId);
 
-        //    if (car == null || car.LastMaintenanceDate == null)
-        //        return new MaintenanceCheckResult { AutoSent = false, Warning = false, Message = "Car not found or missing last maintenance date." };
+            if (car == null)
+                return new MaintenanceCheckResult
+                {
+                    AutoSent = false,
+                    Warning = false,
+                    Message = $"Car with ID {carId} not found."
+                };
 
-        //    DateTime last = car.LastMaintenanceDate.Value;
-        //    int daysPassed = (DateTime.Now - last).Days;
+            DateTime last = car.LastMaintenanceDate;
+            int daysPassed = (DateTime.Now - last).Days;
 
-        //    int interval = car.MaintenanceIntervalDays;     // Example: every 60 days
-        //    int daysLeft = interval - daysPassed;
+            int interval = car.MaintenanceIntervalDays;
+            int daysLeft = interval - daysPassed;
 
-        //    // CASE A — Warning 10 days before maintenance due
-        //    if (daysLeft > 0 && daysLeft <= 10)
-        //    {
-        //        return new MaintenanceCheckResult
-        //        {
-        //            AutoSent = false,
-        //            Warning = true,
-        //            Message = $"Warning: {daysLeft} days left before car maintenance is due."
-        //        };
-        //    }
+            string carInfo = $"[Car #{car.Id} • {car.Brand} {car.Model}]";
 
-        //    // CASE B — Maintenance date has arrived (daysLeft == 0)
-        //    if (daysLeft == 0)
-        //    {
-        //        // Check if within 24h manual window
-        //        if ((DateTime.Now - last.AddDays(interval)).TotalHours <= 24)
-        //        {
-        //            return new MaintenanceCheckResult
-        //            {
-        //                AutoSent = false,
-        //                Warning = true,
-        //                Message = "Maintenance date has arrived. Admin has 24 hours to send car manually."
-        //            };
-        //        }
-        //    }
+            // CASE A — Warning 10 days before maintenance
+            if (daysLeft > 0 && daysLeft <= 10)
+            {
+                return new MaintenanceCheckResult
+                {
+                    AutoSent = false,
+                    Warning = true,
+                    Message = $"Warning: {carInfo}, has {daysLeft} day(s) left before automaticly send it to Maintenance."
+                };
+            }
 
-        //    // CASE C — More than 24 hours late → AUTO SEND
-        //    if (daysLeft < 0 && Math.Abs(daysLeft) >= 1)
-        //    {
-        //        Maintenance m = new Maintenance
-        //        {
-        //            CarId = carId,
-        //            StartDate = DateTime.Now,
-        //            EndDate = DateTime.Now.AddDays(10),
-        //            Description = "Automatic scheduled maintenance",
-        //            Status = "AUTO"
-        //        };
+            // CASE B — Maintenance date has arrived (daysLeft == 0) -> EXACT DAY (24H MANUAL WINDOW)
+            if (daysLeft == 0)
+            {
+                // Check if still inside 24 hours window
+                double hoursSinceDue = (DateTime.Now - last.AddDays(interval)).TotalHours;
 
-        //        bool success = SendToMaintenance(m);
+                if (hoursSinceDue <= 24)
+                {
+                    return new MaintenanceCheckResult
+                    {
+                        AutoSent = false,
+                        Warning = true,
+                        Message = $"Warning: {carInfo} ,this Car Maintenance is due TODAY. Admin has 24 hours to send the car manually."
+                    };
+                }
+            }
 
-        //        return new MaintenanceCheckResult
-        //        {
-        //            AutoSent = success,
-        //            Warning = false,
-        //            Message = $"Car automatically sent to maintenance. (Start: {DateTime.Now:yyyy-MM-dd}, End: {DateTime.Now.AddDays(10):yyyy-MM-dd})"
-        //        };
-        //    }
+            // CASE C — More than 24 hours late -> AUTO SEND
+            if (daysLeft < 0 && Math.Abs(daysLeft) >= 1)
+            {
+                Maintenance m = new Maintenance
+                {
+                    CarId = carId,
+                    StartDate = DateTime.Now,
+                    EndDate = DateTime.Now.AddDays(10),
+                    Description = "Automatic scheduled maintenance",
+                    Status = "AUTO"
+                };
 
-        //    return new MaintenanceCheckResult { AutoSent = false, Warning = false, Message = "No action needed." };
-        //}
+                bool success = SendToMaintenance(m);
+
+                string start = DateTime.Now.ToString("yyyy-MM-dd");
+                string end = DateTime.Now.AddDays(10).ToString("yyyy-MM-dd");
+
+                return new MaintenanceCheckResult
+                {
+                    AutoSent = success,
+                    Warning = false,
+                    Message = $"Warning: {carInfo} , is Automatically sent to maintenance. (Start: {start}, End: {end})"
+                };
+            }
+
+            // DEFAULT → NO ACTION
+            return new MaintenanceCheckResult
+            {
+                AutoSent = false,
+                Warning = false,
+                Message = $"{carInfo} No maintenance action needed."
+            };
+        }
 
         // Show Maintenance Car
         public List<Maintenance> GetHistory(int carId) => maintenanceDao.GetMaintByCar(carId);
